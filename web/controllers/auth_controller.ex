@@ -5,8 +5,7 @@ defmodule Discuss.AuthController do
   alias Discuss.User
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, params) do
-    user_params = %{token: auth.credentials.token, email: auth.info.email, provider: Atom.to_string(auth.provider)}
-    changeset = User.changeset(%User{}, user_params)
+    changeset = User.changeset(%User{}, filter_user_params(auth))
     signin(conn, changeset)
   end
 
@@ -37,5 +36,11 @@ defmodule Discuss.AuthController do
       user ->
         {:ok, user}
     end
+  end
+
+  defp filter_user_params(auth) do
+    %{token: auth.credentials.token,
+      email: auth.info.email,
+      provider: Atom.to_string(auth.provider)}
   end
 end
